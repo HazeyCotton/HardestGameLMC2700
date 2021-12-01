@@ -7,3 +7,7 @@ To test our application:
     Run in console: http-server
 
     You should now be able to see what has been made so far!
+
+    For resources on how to add to this project take a look at the PixiJS library!
+    https://pixijs.io/guides/basics/getting-started.html 
+    A great starting resource is here!
