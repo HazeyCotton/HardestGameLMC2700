@@ -1,24 +1,121 @@
 <!doctype html>
 <html>
   <head>
-      <script src="https://pixijs.download/release/pixi.js"></script>
+      <meta charset="utf-8" />
+      <title>Gamedev Canvas Workshop</title>
+      <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <script> 
-        //Creates a helper application
-        let app = new PIXI.Application({  width: 640, height: 360  });
-        document.body.appendChild( app.view );
 
-        //Creates a sprite and puts it on stage
-        let sprite = PIXI.Sprite.from('sample.png');
-        app.stage.addChild(sprite);
+    <canvas id="myCanvas" width="480" height="320"></canvas>
 
-        //Adds a ticker callback to update movement
-        let elapsed = 0.0;
-        app.ticker.add((delta) => {
-            elapsed += delta;
-            sprite.x = 100 + Math.cos(elapsed/50.0) * 100.0;
-        });
+    <script>
+        var canvas = document.getElementById("myCanvas");
+        var ctx = canvas.getContext("2d");
+
+        var x = canvas.width / 2;
+        var y = canvas.height - 30;
+        var dx = 2;
+        var dy = -2;
+
+        var rightPressed = false;
+        var leftPressed = false;
+        var upPressed = false;
+        var downPressed = false;
+
+        var ballRadius = 10;
+        var paddleHeight = 10;
+        var paddleWidth = 75;
+        var paddleX = (canvas.width - paddleWidth) / 2;
+
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+            drawPaddle();
+
+            //Checks if outta bounds
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                dx = -dx;
+            }
+            //Checks if outta bounds
+            if (y + dy < ballRadius) {
+                dy = -dy;
+            } else if (y + dy > canvas.height - ballRadius) {
+                if (x > paddleX && x < paddleX + paddleWidth) {
+                    dy = -dy;
+                } else {
+                    alert("Game Over");
+                    document.location.reload();
+                    clearInterval(interval);
+                }
+            }
+            
+            x += dx;
+            y += dy;
+
+            if (rightPressed) {
+                paddleX += 7;
+
+                //Checks if outta bounds
+                if (paddleX + paddleWidth > canvas.width) {
+                    paddleX = canvas.width - paddleWidth;
+                }
+            } else if (leftPressed) {
+                paddleX -= 7;
+
+                //Checks if outta bounds
+                if (paddleX < 0) {
+                    paddleX = 0;
+                }
+            }
+        }
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+
+        function keyDownHandler(e) {
+            if (e.key == "Right" || e.key == "ArrowRight") {
+                rightPressed = true;
+            } else if (e.key == "Left" || e.key == "ArrowLeft") {
+                leftPressed = true;
+            } else if (e.key == "Up" || e.key == "ArrowUp") {
+                upPressed = true;
+            } else if (e.key == "Down" || e.key == "ArrowDown") {
+                downPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key == "Right" || e.key == "ArrowRight") {
+                rightPressed = false;
+            } else if (e.key == "Left" || e.key == "ArrowLeft") {
+                leftPressed = false;
+            } else if (e.key == "Up" || e.key == "ArrowUp") {
+                upPressed = false;
+            } else if (e.key == "Down" || e.key == "ArrowDown") {
+                downPressed = false;
+            }
+        }
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+       var interval = setInterval(draw, 10);
     </script>
   </body>
 </html>
