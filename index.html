@@ -1,8 +1,24 @@
 <!doctype html>
 <html>
   <head>
+      <script src="https://pixijs.download/release/pixi.js"></script>
   </head>
   <body>
-    <h1>Hello PixiJS</h1>
+    <script> 
+        //Creates a helper application
+        let app = new PIXI.Application({  width: 640, height: 360  });
+        document.body.appendChild( app.view );
+
+        //Creates a sprite and puts it on stage
+        let sprite = PIXI.Sprite.from('sample.png');
+        app.stage.addChild(sprite);
+
+        //Adds a ticker callback to update movement
+        let elapsed = 0.0;
+        app.ticker.add((delta) => {
+            elapsed += delta;
+            sprite.x = 100 + Math.cos(elapsed/50.0) * 100.0;
+        });
+    </script>
   </body>
 </html>
