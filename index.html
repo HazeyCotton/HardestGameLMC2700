@@ -34,18 +34,19 @@
         var safeX = 0;
         var safeY = 0;
         var safeHeight = screen.height;
-        var safeWidth = 5;
+        var safeWidth = 10;
 
-        var coinHeight = 5;
-        var coinWidth = 5;
-        var coinX = screen.width / 2 - coinWidth;
-        var coinY = screen.height / 2 - coinHeight;
+        var coinRadius = 5;
+        var coinX = screen.width / 2;
+        var coinY = screen.height / 2;
+        var coinCollect = false;
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawSafeZone();
             drawBall();
             drawPlayer();
-            drawSafeZone();
+            drawCoin();
 
             //Checks if outta bounds
             if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
@@ -54,21 +55,35 @@
             if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
                 dy = -dy;
             }
-                //else {
-                //    alert("Game Over");
-                //    document.location.reload();
-                //    clearInterval(interval);
-                //}
-            
-            //Collission of player with ball
-            if (x == playerX) {
-                deathCounter += 1;
-                playerX = canvas.width - playerWidth;
-                playerY = (canvas.height - playerHeight) / 2;
+
+            //Helps calculate all ball boundaries and positions around border
+            var a1 = x - ballRadius;
+            var a3 = x + ballRadius;
+            var b2 = y + ballRadius;
+            var b4 = y - ballRadius;
+
+            //Helps calculate all player boundaries and positions around border
+            var x1 = playerX - playerWidth / 2;
+            var x2 = playerX;
+            var x3 = playerX + playerWidth / 2;
+            var x4 = playerX;
+            var y1 = playerY;
+            var y2 = playerY + playerHeight / 2;
+            var y3 = playerY;
+            var y4 = playerY - playerHeight / 2;
+
+            //Ball collision with player
+            if (((a1 < x1 && x1 < a3) && (b4 < y1 && y1 < b2)) ||
+                ((a1 < x2 && x2 < a3) && (b4 < y2 && y2 < b2)) ||
+                ((a1 < x3 && x3 < a3) && (b4 < y3 && y3 < b2)) ||
+                ((a1 < x4 && x4 < a3) && (b4 < y4 && y4 < b2))) {
+                    deathCounter += 1;
+                    playerX = canvas.width - playerWidth;
+                    playerY = (canvas.height - playerHeight) / 2;
             }
 
             //Checks if player is in safe box
-            if (player.x < safeWidth) {
+            if (playerX < safeWidth && coinCollect) {
                 alert("You safely made it across!");
                 document.location.reload();
                 clearInterval(interval);
@@ -133,6 +148,14 @@
             ctx.beginPath();
             ctx.rect(safeX, safeY, safeWidth, safeHeight);
             ctx.fillStyle = "#00FF00";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawCoin() {
+            ctx.beginPath();
+            ctx.arc(coinX, coinY, coinRadius, 0, Math.PI*2);
+            ctx.fillStyle = "#FFFF00";
             ctx.fill();
             ctx.closePath();
         }
