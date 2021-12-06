@@ -31,6 +31,16 @@
 
         var deathCounter = 0;
 
+        var safeX = 0;
+        var safeY = 0;
+        var safeHeight = screen.height;
+        var safeWidth = 5;
+
+        var coinHeight = 5;
+        var coinWidth = 5;
+        var coinX = screen.width / 2 - coinWidth;
+        var coinY = screen.height / 2 - coinHeight;
+
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
@@ -50,13 +60,19 @@
                 //    clearInterval(interval);
                 //}
             
+            //Collission of player with ball
             if (x == playerX) {
                 deathCounter += 1;
                 playerX = canvas.width - playerWidth;
                 playerY = (canvas.height - playerHeight) / 2;
             }
 
-
+            //Checks if player is in safe box
+            if (player.x < safeWidth) {
+                alert("You safely made it across!");
+                document.location.reload();
+                clearInterval(interval);
+            }
 
             x += dx;
             y += dy;
@@ -114,7 +130,11 @@
         }
 
         function drawSafeZone() {
-
+            ctx.beginPath();
+            ctx.rect(safeX, safeY, safeWidth, safeHeight);
+            ctx.fillStyle = "#00FF00";
+            ctx.fill();
+            ctx.closePath();
         }
 
 
