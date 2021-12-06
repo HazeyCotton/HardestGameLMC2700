@@ -5,6 +5,16 @@
       <title>Gamedev Canvas Workshop</title>
       <link rel="stylesheet" href="style.css" />
   </head>
+  <div>
+      <p1>
+        How to play:
+        Arrow Keys to move!
+      </p1>
+      <p2>
+        Objective:
+        Collect the coin and navigate to the Green Rectangle without dying!
+      </p2>
+  </div>
   <body>
 
     <canvas id="myCanvas" width="480" height="320"></canvas>
@@ -14,9 +24,13 @@
         var ctx = canvas.getContext("2d");
 
         var x = canvas.width / 2;
-        var y = canvas.height - 30;
-        var dx = 2;
-        var dy = -2;
+        var y = canvas.height - 40;
+        var dx = 4;
+        var dy = -4;
+
+        var u = 250;
+        var v = canvas.height - 40;
+        var dv = 4;
 
         var rightPressed = false;
         var leftPressed = false;
@@ -37,8 +51,8 @@
         var safeWidth = 10;
 
         var coinRadius = 5;
-        var coinX = screen.width / 2;
-        var coinY = screen.height / 2;
+        var coinX = 250;
+        var coinY = 150;
         var coinCollect = false;
 
         function draw() {
@@ -46,14 +60,20 @@
             drawSafeZone();
             drawBall();
             drawPlayer();
-            drawCoin();
 
-            //Checks if outta bounds
+            if (!coinCollect) {
+                drawCoin();
+            }
+
+            //Checks if outta bounds for both balls
             if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
                 dx = -dx;
             }
             if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
                 dy = -dy;
+            }
+            if(v + dv > canvas.height - ballRadius || v + dv < ballRadius) {
+                dv = -dv;
             }
 
             //Helps calculate all ball boundaries and positions around border
@@ -61,6 +81,11 @@
             var a3 = x + ballRadius;
             var b2 = y + ballRadius;
             var b4 = y - ballRadius;
+
+            var a2 = u - ballRadius;
+            var a4 = u + ballRadius;
+            var b1 = v + ballRadius;
+            var b3 = v - ballRadius;
 
             //Helps calculate all player boundaries and positions around border
             var x1 = playerX - playerWidth / 2;
@@ -78,19 +103,43 @@
                 ((a1 < x3 && x3 < a3) && (b4 < y3 && y3 < b2)) ||
                 ((a1 < x4 && x4 < a3) && (b4 < y4 && y4 < b2))) {
                     deathCounter += 1;
+                    coinCollect = false;
                     playerX = canvas.width - playerWidth;
                     playerY = (canvas.height - playerHeight) / 2;
             }
 
+            if (((a2 < x1 && x1 < a4) && (b3 < y1 && y1 < b1)) ||
+                ((a2 < x2 && x2 < a4) && (b3 < y2 && y2 < b1)) ||
+                ((a2 < x3 && x3 < a4) && (b3 < y3 && y3 < b1)) ||
+                ((a2 < x4 && x4 < a4) && (b3 < y4 && y4 < b1))) {
+                    deathCounter += 1;
+                    coinCollect = false;
+                    playerX = canvas.width - playerWidth;
+                    playerY = (canvas.height - playerHeight) / 2;
+            }
+
+            var c1 = coinX - coinRadius / 2;
+            var c3 = coinX + coinRadius / 2;
+            var d2 = coinY + coinRadius / 2;
+            var d4 = coinY - coinRadius / 2;
+
+            if (((c1 < x1 && x1 < c3) && (d4 < y1 && y1 < d2)) ||
+                ((c1 < x2 && x2 < c3) && (d4 < y2 && y2 < d2)) ||
+                ((c1 < x3 && x3 < c3) && (d4 < y3 && y3 < d2)) ||
+                ((c1 < x4 && x4 < c3) && (d4 < y4 && y4 < d2))) {
+                    coinCollect = true;
+            }
+
             //Checks if player is in safe box
             if (playerX < safeWidth && coinCollect) {
-                alert("You safely made it across!");
+                alert("You safely made it across but you died " + deathCounter + " time(s)!");
                 document.location.reload();
                 clearInterval(interval);
             }
 
             x += dx;
             y += dy;
+            v += dv;
 
             if (rightPressed) {
                 playerX += 1;
@@ -132,6 +181,12 @@
             ctx.fillStyle = "#FF0000";
             ctx.fill();
             ctx.closePath();
+
+            ctx.beginPath();
+            ctx.arc(u, v, ballRadius, 0, Math.PI*2);
+            ctx.fillStyle = "#FF0000";
+            ctx.fill();
+            ctx.closePath();
         }
 
         function drawPlayer() {
@@ -154,8 +209,8 @@
 
         function drawCoin() {
             ctx.beginPath();
-            ctx.arc(coinX, coinY, coinRadius, 0, Math.PI*2);
-            ctx.fillStyle = "#FFFF00";
+            ctx.rect(coinX, coinY, coinRadius, coinRadius);
+            ctx.fillStyle = "#000000";
             ctx.fill();
             ctx.closePath();
         }
